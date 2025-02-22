@@ -1,5 +1,5 @@
 # 💫 About Me:
-🌱 I’m currently working on Web Dev Projects<br>💻 Learning React and Tailwind rn<br><br>
+🌱 I’m currently working on Web Dev Projects<br>💻 Learning React and Tailwind rn<br><br> 18, A Visual Designer !
 
 
 ## 🌐 Socials:
