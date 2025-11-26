@@ -72,7 +72,7 @@
   <img src="https://skillicons.dev/icons?i=androidstudio" height="40" alt="androidstudio logo"  />
 </div>
 
-###
+
 ---
 
 <br clear="both">
@@ -82,8 +82,8 @@
   <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/0day-Ashish/0day-Ashish/output/pacman-contribution-graph.svg">
   <img alt="pacman contribution graph" src="https://raw.githubusercontent.com/0day-Ashish/0day-Ashish/output/pacman-contribution-graph.svg">
 </picture>
+---
 
-###
 
 <h2 align="center">Connect⌛️</h2>
 
