@@ -46,4 +46,6 @@
 
 <img src="https://raw.githubusercontent.com/0day-Ashish/0day-Ashish/output/snake.svg" alt="Snake animation" />
 
+![Alt text](https://spotify-recently-played-readme.vercel.app/api?user=313vt5jggm44rzblolpc6jpmdnsi&count={count})
+
 ###
