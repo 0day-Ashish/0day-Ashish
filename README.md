@@ -113,5 +113,12 @@
   <img src="https://count.getloli.com/@:0day-Ashish?theme=booru-koe&padding=4&offset=1&scale=1&align=top&pixelated=1&darkmode=auto"  />
 </div>
 
-![Alt text](https://spotify-recently-played-readme.vercel.app/api?user=313vt5jggm44rzblolpc6jpmdnsi)
+###
 
+<br clear="both">
+
+<div align="center">
+  <img src="https://spotify-recently-played-readme.vercel.app/api?count=5" alt="Spotify recently played"  />
+</div>
+
+###
