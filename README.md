@@ -2,7 +2,7 @@
 
 ###
 
-<h4 align="left">Hi👋 Ashish here !  a computer science student who loves building practical, creative, and fast-moving projects. I enjoy working across full-stack development, AI, and tooling, and I’m always experimenting with new ideas. Most of my repos are small builds, prototypes, and things I’m learning along the way.</h4>
+<h3 align="left">Hi👋 Ashish here !  a computer science student who loves building practical, creative, and fast-moving projects. I enjoy working across full-stack development, AI, and tooling, and I’m always experimenting with new ideas. Most of my repos are small builds, prototypes, and things I’m learning along the way.</h3>
 
 ###
 
