@@ -8,7 +8,7 @@
 
 <br clear="both">
 
-<div align="right">
+<div align="center">
   <img src="https://streak-stats.demolab.com?user=0day-Ashish&locale=en&mode=daily&theme=dracula&hide_border=false&border_radius=5" height="150" alt="streak graph" /> <br>
   <img src="https://github-readme-activity-graph.vercel.app/graph?username=0day-Ashish&theme=redical&hide_border=false&area=false&custom_title=ard's%20Contributions%20~" height="150" alt="activity-graph graph"  />
 </div>
