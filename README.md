@@ -118,7 +118,7 @@
 <br clear="both">
 
 <div align="center">
-  <img src="https://spotify-recently-played-readme.vercel.app/api?user=313vt5jggm44rzblolpc6jpmdnsi />
+  <img height="150" src="https://media.giphy.com/media/M9gbBd9nbDrOTu1Mqx/giphy.gif"  />
 </div>
 
 ###
