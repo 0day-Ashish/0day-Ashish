@@ -305,10 +305,11 @@ def svg_overwrite(filename, age_data, commit_data, star_data, repo_data, contrib
     root = tree.getroot()
     justify_format(root, 'commit_data', commit_data, 22)
     justify_format(root, 'star_data', star_data, 14)
-    justify_format(root, 'repo_data', repo_data, 6)
+    # shrink the repo dots as the contrib count grows so the '|' columns stay aligned
+    justify_format(root, 'repo_data', repo_data, 8 - len('{:,}'.format(contrib_data)))
     justify_format(root, 'contrib_data', contrib_data)
     justify_format(root, 'follower_data', follower_data, 10)
-    justify_format(root, 'loc_data', loc_data[2], 9)
+    justify_format(root, 'loc_data', loc_data[2], 12)
     justify_format(root, 'loc_add', loc_data[0])
     justify_format(root, 'loc_del', loc_data[1], 7)
     find_and_replace(root, 'age_data', age_data)
