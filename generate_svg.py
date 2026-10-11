@@ -1,18 +1,23 @@
 """
-Builds dark_mode.svg and light_mode.svg from the GitHub avatar and the profile info below.
-Run this locally whenever the profile picture or the static info changes:
+Builds dark_mode.svg and light_mode.svg from a photo and the profile info below.
+Run this locally whenever the photo or the static info changes:
 
-    python3 generate_svg.py            # uses the current GitHub avatar
-    python3 generate_svg.py photo.jpg  # uses a local image instead
+    python3 generate_svg.py                 # uses the current GitHub avatar
+    python3 generate_svg.py photo.jpg       # uses a local image instead
+    python3 generate_svg.py photo.jpg 0.25  # ...cropped around 25% from the left edge
+
+The photo is resized, re-encoded without metadata (EXIF/GPS) and embedded as base64,
+since GitHub does not load external images inside SVGs.
 
 Requires Pillow (pip install pillow). The numbers under "GitHub Stats" are placeholders,
 today.py (run daily by GitHub Actions) fills them in by element id.
 """
+import base64
 import io
 import sys
 import urllib.request
 from xml.sax.saxutils import escape
-from PIL import Image, ImageFilter, ImageOps
+from PIL import Image, ImageOps
 
 USER_NAME = '0day-Ashish'
 
@@ -25,12 +30,9 @@ FONT_SIZE = 14
 COLS = 70                # characters per info line (rules are drawn to this width)
 VALUE_COL = 26           # column where values start
 
-ART_COLS, ART_ROWS = 60, 60
-ART_FONT_SIZE = 9.2
-ART_CHAR_W = ART_FONT_SIZE * 0.6
-ART_LINE_H = 10.2
-ART_RAMP = ' .,:-=+*#%@'
-TEXT_X = PAD + int(ART_COLS * ART_CHAR_W) + 30
+PHOTO_W = 331
+PHOTO_TOP = TOP - 14
+TEXT_X = PAD + PHOTO_W + 30
 
 # ---- Content --------------------------------------------------------------
 # (key, value) rows, '.' is an empty spacer row, ('#', title) a section header
@@ -69,31 +71,32 @@ INFO = [
 THEMES = {
     'dark': dict(bg='#0d1117', card='#161b22', border='#30363d', text='#c9d1d9', key='#ffa657',
                  value='#a5d6ff', cc='#616e7f', add='#3fb950', dele='#f85149', user='#7ee787',
-                 section='#d2a8ff', art=('#a5d6ff', '#d2a8ff'), bar='#21262d'),
+                 section='#d2a8ff', bar='#21262d'),
     'light': dict(bg='#ffffff', card='#f6f8fa', border='#d0d7de', text='#24292f', key='#953800',
                   value='#0a3069', cc='#8c959f', add='#1a7f37', dele='#cf222e', user='#116329',
-                  section='#8250df', art=('#0969da', '#8250df'), bar='#eaeef2'),
+                  section='#8250df', bar='#eaeef2'),
 }
 PALETTE = ['#f85149', '#ffa657', '#e3b341', '#3fb950', '#39c5cf', '#58a6ff', '#bc8cff', '#c9d1d9']
 
 
-def ascii_art(image):
+def photo_data_uri(image, photo_h, focus_x=0.5):
     """
-    Converts a portrait into ART_ROWS lines of ASCII, dark background becomes blank space
+    Crops the photo to the panel's aspect ratio around focus_x and returns it as a JPEG data URI
     """
-    im = image.convert('L')
+    im = ImageOps.exif_transpose(image).convert('RGB')
     w, h = im.size
-    y0, y1 = 0, int(h * 0.78)
-    crop_w = int((y1 - y0) * ART_COLS * ART_CHAR_W / (ART_ROWS * ART_LINE_H))
-    x0 = max(0, min(w - crop_w, (w - crop_w) // 2))
-    im = im.crop((x0, y0, x0 + crop_w, y1)).filter(ImageFilter.GaussianBlur(1.2 * w / 460))
-    im = ImageOps.autocontrast(im, cutoff=0.5)
-    floor, gamma = 10, 0.4
-    im = im.point(lambda v: 0 if v < floor else int(255 * ((v - floor) / (255 - floor)) ** gamma))
-    im = im.resize((ART_COLS, ART_ROWS), Image.LANCZOS).filter(ImageFilter.UnsharpMask(1, 80, 0))
-    n = len(ART_RAMP)
-    return [''.join(ART_RAMP[min(n - 1, im.getpixel((x, y)) * n // 256)] for x in range(ART_COLS)).rstrip()
-            for y in range(ART_ROWS)]
+    aspect = PHOTO_W / photo_h
+    if w / h > aspect:
+        crop_w = int(h * aspect)
+        x0 = max(0, min(w - crop_w, int(w * focus_x - crop_w / 2)))
+        im = im.crop((x0, 0, x0 + crop_w, h))
+    else:
+        crop_h = int(w / aspect)
+        im = im.crop((0, (h - crop_h) // 2, w, (h - crop_h) // 2 + crop_h))
+    im = im.resize((PHOTO_W * 2, int(photo_h * 2)), Image.LANCZOS)
+    buf = io.BytesIO()
+    im.save(buf, 'JPEG', quality=82, optimize=True, progressive=True)  # no exif= so metadata is dropped
+    return 'data:image/jpeg;base64,' + base64.b64encode(buf.getvalue()).decode()
 
 
 def dots(prefix_len):
@@ -137,12 +140,16 @@ def info_lines():
     return rows
 
 
-def build(theme, art):
+def panel_height():
+    return TOP + LINE_H * len(info_lines()) + 6 - PHOTO_TOP
+
+
+def build(theme, photo):
     t = THEMES[theme]
     rows = info_lines()
     text_bottom = TOP + LINE_H * (len(rows) + 1)
-    height = max(text_bottom, TOP - 12 + ART_ROWS * ART_LINE_H) + PAD
-    art_y = TOP - 10 + (text_bottom - TOP - ART_ROWS * ART_LINE_H) / 2
+    height = text_bottom + PAD
+    photo_h = panel_height()
 
     out = [f'''<?xml version='1.0' encoding='UTF-8'?>
 <svg xmlns="http://www.w3.org/2000/svg" font-family="ConsolasFallback,Consolas,'SF Mono',Menlo,monospace" width="{WIDTH}px" height="{height:.0f}px" font-size="{FONT_SIZE}px">
@@ -161,16 +168,12 @@ size-adjust: 109%;
 .cc {{fill: {t['cc']};}}
 .user {{fill: {t['user']};}}
 .section {{fill: {t['section']};}}
-.art {{font-size: {ART_FONT_SIZE}px;}}
 .cursor {{animation: blink 1.1s steps(1) infinite;}}
 @keyframes blink {{ 50% {{ opacity: 0; }} }}
 text, tspan {{white-space: pre;}}
 </style>
 <defs>
-<linearGradient id="artFill" x1="0" y1="0" x2="0" y2="1">
-<stop offset="0%" stop-color="{t['art'][0]}"/>
-<stop offset="100%" stop-color="{t['art'][1]}"/>
-</linearGradient>
+<clipPath id="photoClip"><rect x="{PAD}" y="{PHOTO_TOP}" width="{PHOTO_W}" height="{photo_h}" rx="10"/></clipPath>
 </defs>
 <rect width="{WIDTH}px" height="{height:.0f}px" fill="{t['card']}" stroke="{t['border']}" rx="12"/>
 <path d="M12 0.5 H{WIDTH - 12} A11.5 11.5 0 0 1 {WIDTH - 0.5} 12 V36 H0.5 V12 A11.5 11.5 0 0 1 12 0.5 Z" fill="{t['bar']}"/>
@@ -180,10 +183,8 @@ text, tspan {{white-space: pre;}}
 <circle cx="62" cy="18" r="6" fill="#27c93f"/>
 <text x="{WIDTH / 2:.0f}" y="23" text-anchor="middle" font-size="13px" class="cc">ashish@arddev.in: ~ — neofetch</text>''']
 
-    out.append(f'<text x="{PAD}" y="{art_y:.1f}" class="art" fill="url(#artFill)">')
-    for i, line in enumerate(art):
-        out.append(f'<tspan x="{PAD}" y="{art_y + i * ART_LINE_H:.1f}">{escape(line)}</tspan>')
-    out.append('</text>')
+    out.append(f'<image x="{PAD}" y="{PHOTO_TOP}" width="{PHOTO_W}" height="{photo_h}" preserveAspectRatio="xMidYMid slice" clip-path="url(#photoClip)" href="{photo}"/>')
+    out.append(f'<rect x="{PAD}" y="{PHOTO_TOP}" width="{PHOTO_W}" height="{photo_h}" rx="10" fill="none" stroke="{t["border"]}"/>')
 
     out.append(f'<text x="{TEXT_X}" y="{TOP}" fill="{t["text"]}">')
     out.append(f'<tspan x="{TEXT_X}" y="{TOP}"><tspan class="user">ashish</tspan>@<tspan class="value">arddev.in</tspan></tspan><tspan class="cc">{rule(16)}</tspan>')
@@ -206,8 +207,9 @@ if __name__ == '__main__':
     else:
         with urllib.request.urlopen(f'https://github.com/{USER_NAME}.png?size=800') as r:
             avatar = Image.open(io.BytesIO(r.read()))
-    art = ascii_art(avatar)
+    focus_x = float(sys.argv[2]) if len(sys.argv) > 2 else 0.5
+    photo = photo_data_uri(avatar, panel_height(), focus_x)
     for theme in THEMES:
         with open(f'{theme}_mode.svg', 'w', encoding='utf-8') as f:
-            f.write(build(theme, art))
-    print('\n'.join(art))
+            f.write(build(theme, photo))
+    print(f'embedded photo: {len(photo) // 1024} KB')
