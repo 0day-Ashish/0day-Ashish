@@ -34,7 +34,7 @@ text, tspan {white-space: pre;}
 <text x="391" y="66" fill="#c9d1d9">
 <tspan x="391" y="66"><tspan class="user">ashish</tspan>@<tspan class="value">arddev.in</tspan></tspan><tspan class="cc"> —————————————————————————————————————————————————————</tspan>
 <tspan x="391" y="84" class="cc">. </tspan><tspan class="key">OS</tspan>:<tspan class="cc"> ................... </tspan><tspan class="value">macOS, Linux, iOS, Android</tspan>
-<tspan x="391" y="102" class="cc">. </tspan><tspan class="key">Uptime</tspan>:<tspan class="cc" id="age_data_dots"> ............... </tspan><tspan class="value" id="age_data">20 years, 4 months, 5 days</tspan>
+<tspan x="391" y="102" class="cc">. </tspan><tspan class="key">Uptime</tspan>:<tspan class="cc" id="age_data_dots"> ............... </tspan><tspan class="value" id="age_data">20 years, 4 months, 6 days</tspan>
 <tspan x="391" y="120" class="cc">. </tspan><tspan class="key">Host</tspan>:<tspan class="cc"> ................. </tspan><tspan class="value">Bengaluru, India</tspan>
 <tspan x="391" y="138" class="cc">. </tspan><tspan class="key">Kernel</tspan>:<tspan class="cc"> ............... </tspan><tspan class="value">Designer &amp; Full Stack Developer</tspan>
 <tspan x="391" y="156" class="cc">. </tspan><tspan class="key">IDE</tspan>:<tspan class="cc"> .................. </tspan><tspan class="value">Cursor, VSCode, Android Studio</tspan>
